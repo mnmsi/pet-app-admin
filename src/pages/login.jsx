@@ -3,7 +3,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../components/Header";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
@@ -12,7 +12,11 @@ const Login = () => {
   const navigate = useNavigate();
   const [is_error, set_error] = useState(null);
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  useEffect(()=>{
+    window.scroll({"top":0,"behavior":"smooth"});
+  },[])
   const handleFormSubmit = (values) => {
+
     axios
       .post(`${process.env.REACT_APP_API_URL}/api/users/login`, {
         email: values.email,

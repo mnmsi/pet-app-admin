@@ -13,7 +13,7 @@ function App() {
     let token = localStorage.getItem("pet-token") ?? null;
     if (token) {
       setAuth(true);
-      navigate("/");
+      // navigate("/");
     } else {
       setAuth(false);
       navigate("/login");
