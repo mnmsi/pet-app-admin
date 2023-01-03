@@ -47,10 +47,12 @@ const Dashboard = () => {
                     <TableCell align="left">{user.phone ? user.phone : "NULL"}</TableCell>
                     <TableCell align="left">{user.city ? user.city : "NULL"}</TableCell>
                     <TableCell align="left">{user.country ? user.country : "NULL"}</TableCell>
+
                     <TableCell align="left">
                         {user.profileImg.length > 0 ? (<Avatar src={user.profileImg[0]}
                                                                alt="avatar"/>) : (<Avatar alt="avatar"/>)}
                     </TableCell>
+                    <TableCell align="left">{user.isBan === "false" ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
                         <IconButton aria-label="show" color="secondary" onClick={() => ShowPets(user._id)}>
                             <PetsIcon/>
@@ -79,6 +81,13 @@ const Dashboard = () => {
 
     const handleBan = (id) => {
         console.log(id)
+        axios.post(`${process.env.REACT_APP_API_URL}/api/users/Ban_and_UnBan`, {_id:id},
+
+            ).then((res) => {
+            if (res.data.success) {
+                window.location.reload();
+            }
+        })
     }
 
     // delete user
@@ -105,6 +114,7 @@ const Dashboard = () => {
                             <TableCell align="left">City</TableCell>
                             <TableCell align="left">Country</TableCell>
                             <TableCell align="left">Avatar</TableCell>
+                            <TableCell align="left">Ban Status</TableCell>
                             <TableCell align="center">Action</TableCell>
                         </TableRow>
                     </TableHead>
