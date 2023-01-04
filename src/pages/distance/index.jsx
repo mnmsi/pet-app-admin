@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, IconButton} from "@mui/material";
+import {Avatar, Box, Button, IconButton} from "@mui/material";
 import Header from "../../components/Header";
 import Typography from "@mui/material/Typography";
 import TableContainer from "@mui/material/TableContainer";
@@ -16,12 +16,12 @@ import {Link, useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
 import {useLocation} from "react-router-dom";
 
-const PetType = () => {
+const Distance = () => {
         const {pathname} = useLocation();
         const notify = () => toast.success("Success!");
         const error = () => toast.error("Error!");
-        const [isLoading, setLoading] = useState(true);
         const [speciesList, setSpeciesList] = useState([]);
+        const [isLoading, setLoading] = useState(true);
         const navigate = useNavigate();
         let isAuth = localStorage.getItem("pet-token") ?? null;
         const config = {
@@ -31,19 +31,20 @@ const PetType = () => {
         }
 
         let getSpecies = () => {
-            axios.get(`${process.env.REACT_APP_API_URL}/api/idtype/list`, config).then((res) => {
+            axios.get(`${process.env.REACT_APP_API_URL}/api/pet/notification/distance`, config).then((res) => {
                 if (res.data.data) {
                     setSpeciesList(res.data.data);
                     setLoading(false);
                 }
             }).catch((err) => {
-                // (err);
+               error();
             })
         }
         useEffect(() => {
             getSpecies();
             window.scroll({"top": 0, "behavior": "smooth"});
         }, [pathname])
+
         let renderSpeciesList = null;
         if (speciesList.length > 0) {
             renderSpeciesList = speciesList.map((species, index) => {
@@ -53,32 +54,28 @@ const PetType = () => {
                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                     >
                         <TableCell component="th" scope="row">
-                            {species.title ? species.title : "NULL"}
+                            {species.distance ? species.distance : "NULL"}
                         </TableCell>
+
                         <TableCell
                             align="left">{species.createdAt ? new Date(species.createdAt).toDateString() : "NULL"}</TableCell>
                         <TableCell align="center">
                             <IconButton aria-label="edit" color="secondary"
-                                        onClick={() => handleUpdate(species.title, species._id)}>
+                                        onClick={() => handleUpdate(species.distance, species._id)}>
                                 <EditRoundedIcon/>
                             </IconButton>
-                            <IconButton aria-label="delete" color="error" onClick={() => handleDelete(species._id)}>
-                                <Delete/>
-                            </IconButton>
-
                         </TableCell>
                     </TableRow>
                 )
             })
         }
-
         const handleUpdate = (title, id) => {
-            navigate(`/petidtype/edit`, {
+            navigate(`/distance/edit`, {
                 state: {id: id, title: title}
             });
         }
         const handleDelete = (id) => {
-            axios.get(`${process.env.REACT_APP_API_URL}/api/idtype/admin/delete`,
+            axios.get(`${process.env.REACT_APP_API_URL}/api/pettype/admin/delete`,
                 {headers: {Authorization: `Bearer ${isAuth}`}, params: {_id: id}}
             ).then((res) => {
                 if (res.data.status) {
@@ -88,20 +85,17 @@ const PetType = () => {
                 }
             }).catch((err) => {
                 error();
-            })
+            });
         }
         return (
             <Box m="20px">
                 {/* HEADER */}
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Header title="Pet Id Type" subtitle="List | Create | Update | Delete"/>
+                    <Header title="Distance" subtitle="List  | Update "/>
                     {/*    create new button */}
-                    <Button variant="contained">
-                        <Link to="/petidtype/create" style={{textDecoration: "none", color: "white"}}>Create New</Link>
-                    </Button>
                 </Box>
                 {/* start user section */}
-                <Typography variant="h1" sx={{mt: 2, mb: 1}}>Pet ID Types</Typography>
+                <Typography variant="h2" sx={{mt: 2, mb: 1}}>Distance</Typography>
                 <TableContainer component={Paper}>
                     <Table sx={{minWidth: 650}} aria-label="simple table">
                         <TableHead>
@@ -113,7 +107,7 @@ const PetType = () => {
                         </TableHead>
                         <TableBody>
                             {isLoading ? <TableRow>
-                                <TableCell colSpan={3} align="center">Loading...</TableCell>
+                                <TableCell colSpan={4} align="center">Loading...</TableCell>
                             </TableRow> : renderSpeciesList}
                         </TableBody>
                     </Table>
@@ -123,4 +117,4 @@ const PetType = () => {
     }
 ;
 
-export default PetType;
+export default Distance;

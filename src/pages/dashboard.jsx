@@ -1,4 +1,4 @@
-import {Avatar, Box, Button, IconButton, Skeleton, Typography, useTheme} from "@mui/material";
+import {Avatar, Box, Button, IconButton, Pagination, Skeleton, Typography, useTheme} from "@mui/material";
 import {tokens} from "../theme";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Header from "../components/Header";
-import {useEffect, useState} from "react";
+import {useEffect, useState,useLayoutEffect } from "react";
 import PetsIcon from '@mui/icons-material/Pets';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
@@ -19,9 +19,9 @@ import {toast} from "react-toastify";
 const Dashboard = () => {
     const navigate = useNavigate();
     const [userList, setUserlist] = useState([]);
-    const theme = useTheme();
     const [isLoading, setLoading] = useState(true);
-    const colors = tokens(theme.palette.mode);
+    let [totalPage, setTotalPage] = useState(0);
+    let [page, setPage] = useState(1);
     let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const config = {
@@ -29,15 +29,17 @@ const Dashboard = () => {
             Authorization: `Bearer ${isAuth}`
         }
     }
-    useEffect(() => {
+    useLayoutEffect(() => {
         window.scroll({"top": 0, "behavior": "smooth"});
-        axios.get(`${process.env.REACT_APP_API_URL}/api/users/list`, config).then((res) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/api/users/list?page=${page}&limit=1`, config).then((res) => {
             if (res.data.data) {
                 setLoading(false);
-                setUserlist(res.data.data);
+                setUserlist(res.data.data?.user_res);
+                setPage(Number(res.data.data?.currentPage));
+                setTotalPage(res.data.data?.totalPages);
             }
         })
-    }, [])
+    }, [page])
 
     if (userList.length > 0) {
         renderuserList = userList.map((user, index) => {
@@ -53,10 +55,9 @@ const Dashboard = () => {
                     <TableCell align="left">{user.phone ? user.phone : "NULL"}</TableCell>
                     <TableCell align="left">{user.city ? user.city : "NULL"}</TableCell>
                     <TableCell align="left">{user.country ? user.country : "NULL"}</TableCell>
-
                     <TableCell align="left">
-                        {user.profileImg.length > 0 ? (<Avatar src={user.profileImg[0]}
-                                                               alt="avatar"/>) : (<Avatar alt="avatar"/>)}
+                        {user.profileImg.length > 0 ? (<Avatar  src={user.profileImg[0]}
+                                                               alt={user.name?.toUpperCase()}/>) : (<Avatar alt={user.name?.toUpperCase()}/>)}
                     </TableCell>
                     <TableCell align="left">{user.isBan ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
@@ -73,8 +74,8 @@ const Dashboard = () => {
                 </TableRow>
             )
         })
-    }else {
-    //     show data not found
+    } else {
+        //     show data not found
         renderuserList = <TableRow><TableCell align="center" colSpan={8}>No User Found</TableCell></TableRow>;
     }
 
@@ -147,10 +148,19 @@ const Dashboard = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {isLoading ? <TableRow><TableCell align="center" colSpan={8}>Loading...</TableCell></TableRow> : renderuserList}
+                        {
+                            isLoading ? <TableRow>
+                                <TableCell align="center"
+                                           colSpan={8}>Loading...</TableCell>
+                            </TableRow> : renderuserList
+                        }
                     </TableBody>
                 </Table>
             </TableContainer>
+            {Number(totalPage) > 1 ? <Box display="flex" justifyContent="flex-end" sx={{mt: 2}}>
+                <Pagination siblingCount={0} boundaryCount={2} count={totalPage} page={Number(page)}
+                            onChange={(e, page) => setPage(page)}/>
+            </Box> : null}
         </Box>
     );
 };

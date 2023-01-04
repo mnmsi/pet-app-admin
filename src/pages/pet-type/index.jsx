@@ -37,7 +37,7 @@ const PetIdType = () => {
                     setLoading(false);
                 }
             }).catch((err) => {
-                console.log(err);
+                (err);
             })
         }
         useEffect(() => {

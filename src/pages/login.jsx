@@ -128,7 +128,7 @@ const Login = () => {
   );
 };
 
-const checkoutSchema = yup.object().shape({
+const checkoutSchema = yup?.object().shape({
   email: yup.string().email("invalid email").required("This field required"),
   password: yup.string().required("This field required").min(6),
 });

@@ -1,30 +1,29 @@
 import React, {useEffect, useState} from 'react';
+import {useLocation} from "react-router-dom";
 import {
     Alert,
     Box,
     Button,
     Grid,
-    MenuItem,
     TextField
 } from "@mui/material";
 import Header from "../../components/Header";
 import axios from "axios";
 import {toast} from "react-toastify";
-import {useNavigate} from "react-router";
+import {useNavigate} from "react-router-dom";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {Formik} from "formik";
 import * as yup from "yup";
-import {useLocation} from "react-router-dom";
 
-const CreateSpecies = () => {
-    const { pathname } = useLocation();
-    useEffect(()=>{
-        window.scroll({"top":0,"behavior":"smooth"});
-    },[])
+const UpdateDistance = () => {
+    const {state} = useLocation();
     const notify = () => toast.success("Success!");
     const navigate = useNavigate();
     const [is_error, set_error] = useState(null);
     const isNonMobile = useMediaQuery("(min-width:600px)");
+    useEffect(()=>{
+        window.scroll({"top":0,"behavior":"smooth"});
+    },[])
     const handleFormSubmit = (values) => {
         let config = {
             headers: {
@@ -32,15 +31,15 @@ const CreateSpecies = () => {
             }
         }
         axios
-            .post(`${process.env.REACT_APP_API_URL}/api/species/admin/create`, {
-                title: values.title,
-                petType: values.petType,
-            },config)
+            .post(`${process.env.REACT_APP_API_URL}/api/pet/notification/distance/add`, {
+                distance: values.title,
+                _id: values.id,
+            }, config)
             .then((res) => {
                 if (res.data.status) {
                     set_error(false);
                     notify();
-                    navigate("/species");
+                    navigate("/distance");
                 }
             })
             .catch((err) => {
@@ -53,40 +52,20 @@ const CreateSpecies = () => {
         }, 3000);
     };
 
-    // let loadPetType = [{value: '', option: 'Select Pet Type'}];
-    let [loadPetType,setLoadPetType] = useState([{value: '', option: 'Select Pet Type'}])
-    let config = {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("pet-token")}`,
-        }
-    }
-    useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}/api/pettype/list`, config).then((res) => {
-            if (res.data.status) {
-                let data = res.data.data;
-                const newData = data.map((item) => {
-                        return ({value: item._id, option: item.title})
-                })
-                setLoadPetType(newData)
-                // data.map((item) => {
-                //     loadPetType.push({value: item._id, option: item.title})
-                // })
-            }
-        })
-    }, [pathname])
     const checkoutSchema = yup.object().shape({
         title: yup.string().required("This field required"),
-        petType: yup.string().required("This field required"),
     });
+
     const initialValues = {
-        title: "",
-        petType: loadPetType[0].value,
+        title: state.title,
+        id: state.id,
     };
+
 
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Create Species" subtitle=""/>
+                <Header title="Update Distance" subtitle="" center={undefined}/>
             </Box>
             <Grid
                 container
@@ -100,6 +79,7 @@ const CreateSpecies = () => {
                             onSubmit={handleFormSubmit}
                             initialValues={initialValues}
                             validationSchema={checkoutSchema}
+                            enableReinitialize={true}
                         >
                             {({
                                   values,
@@ -133,23 +113,10 @@ const CreateSpecies = () => {
                                             helperText={touched.title && errors.title}
                                             sx={{gridColumn: "span 4"}}
                                         />
-                                        <TextField
-                                            name="petType"
-                                            fullWidth
-                                            variant="filled"
-                                            type="text"
-                                            label="Pet Type"
-                                            select
-                                            onBlur={handleBlur}
-                                            onChange={handleChange}
-                                            value={values.petType}
-                                            error={!!touched.petType && !!errors.petType}
-                                            helperText={touched.petType && errors.petType}
-                                            sx={{gridColumn: "span 4"}}>
-                                            {loadPetType?.map((item, index) => {
-                                                return <MenuItem key={index} value={item.value}>{item.option}</MenuItem>
-                                            })}
-                                        </TextField>
+
+                                        <input type="hidden" name="id" onBlur={handleBlur}
+                                               onChange={handleChange}
+                                               value={values.id}/>
 
                                     </Box>
                                     {is_error ? (
@@ -179,4 +146,4 @@ const CreateSpecies = () => {
     );
 };
 
-export default CreateSpecies;
+export default UpdateDistance;

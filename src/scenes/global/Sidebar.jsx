@@ -1,16 +1,17 @@
 import {useState} from "react";
 import {ProSidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {Box, Button, IconButton, Typography, useTheme} from "@mui/material";
+import {Box, Button, Typography, useTheme} from "@mui/material";
 import {Link, useLocation} from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import {tokens} from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import PetsIcon from "@mui/icons-material/Pets";
 import {Logout} from "@mui/icons-material";
 import axios from "axios";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import TypeSpecimenIcon from '@mui/icons-material/TypeSpecimen';
+import CatchingPokemonIcon from '@mui/icons-material/CatchingPokemon';
 import {toast} from 'react-toastify';
 
 const Item = ({title, to, icon, selected, setSelected}) => {
@@ -39,7 +40,6 @@ const Sidebar = () => {
     let pathName = pathname.split("/")[1].slice(0, 1).toUpperCase() + pathname.split("/")[1]?.slice(1);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [isCollapsed, setIsCollapsed] = useState(false);
     const [selected, setSelected] = useState(pathName ? pathName : "Dashboard");
     // logout
     const logout = () => {
@@ -81,61 +81,49 @@ const Sidebar = () => {
                 },
             }}
         >
-            <ProSidebar collapsed={isCollapsed}>
+            <ProSidebar >
                 <Menu iconShape="square">
                     {/* LOGO AND MENU ICON */}
                     <MenuItem
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                        icon={isCollapsed ? <MenuOutlinedIcon/> : undefined}
                         style={{
                             margin: "10px 0 20px 0",
                             color: colors.grey[100],
                         }}
                     >
-                        {!isCollapsed && (
                             <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
                                 ml="15px"
                             >
-                                <Typography variant="h3" color={colors.grey[100]}>
-                                    ADMINIS
+                                <Typography textAlign="center" variant="h4" color={colors.grey[100]}>
+                                   Pet App Admin Panel
                                 </Typography>
-                                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                                    <MenuOutlinedIcon/>
-                                </IconButton>
                             </Box>
-                        )}
                     </MenuItem>
-                    {!isCollapsed && (
-                        <Box mb="25px">
-                            <Box display="flex" justifyContent="center" alignItems="center">
-                                <img
-                                    alt="profile-user"
-                                    width="100px"
-                                    height="100px"
-                                    src={`../../assets/user.png`}
-                                    style={{cursor: "pointer", borderRadius: "50%"}}
-                                />
-                            </Box>
-                            <Box textAlign="center">
-                                <Typography
-                                    variant="h2"
-                                    color={colors.grey[100]}
-                                    fontWeight="bold"
-                                    sx={{m: "10px 0 0 0"}}
-                                >
-                                    Ed Roh
-                                </Typography>
-                                <Typography variant="h5" color={colors.greenAccent[500]}>
-                                    VP Fancy Admin
-                                </Typography>
-                            </Box>
+                    <Box mb="25px">
+                        <Box display="flex" justifyContent="center" alignItems="center">
+                            <img
+                                alt="profile-user"
+                                width="100px"
+                                height="100px"
+                                src={`../../assets/user.png`}
+                                style={{cursor: "pointer", borderRadius: "50%"}}
+                            />
                         </Box>
-                    )}
+                        <Box textAlign="center">
+                            <Typography
+                                variant="h2"
+                                color={colors.grey[100]}
+                                fontWeight="bold"
+                                sx={{m: "10px 0 0 0"}}
+                            >
+                                Ed Roh
+                            </Typography>
+                            <Typography variant="h5" color={colors.greenAccent[500]}>
+                                VP Fancy Admin
+                            </Typography>
+                        </Box>
+                    </Box>
 
-                    <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+                    <Box paddingLeft={"10%"}>
                         <Item
                             title="Dashboard"
                             to="/"
@@ -160,14 +148,21 @@ const Sidebar = () => {
                         <Item
                             title="Petidtype"
                             to="/petidtype"
-                            icon={<ReceiptOutlinedIcon/>}
+                            icon={<TypeSpecimenIcon/>}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
                             title="Pettype"
                             to="/pettype"
-                            icon={<ReceiptOutlinedIcon/>}
+                            icon={<CatchingPokemonIcon/>}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+                        <Item
+                            title="Distance"
+                            to="/distance"
+                            icon={<LocationOnIcon/>}
                             selected={selected}
                             setSelected={setSelected}
                         />
