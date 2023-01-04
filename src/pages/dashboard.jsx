@@ -13,12 +13,15 @@ import PetsIcon from '@mui/icons-material/Pets';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 const Dashboard = () => {
+    const navigate = useNavigate();
     const [userList, setUserlist] = useState([]);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    let renderuserList = <Skeleton/>
+    let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const config = {
         headers: {
@@ -26,6 +29,7 @@ const Dashboard = () => {
         }
     }
     useEffect(() => {
+        window.scroll({"top": 0, "behavior": "smooth"});
         axios.get(`${process.env.REACT_APP_API_URL}/api/users/list`, config).then((res) => {
             if (res.data.data) {
                 setUserlist(res.data.data);
@@ -52,9 +56,9 @@ const Dashboard = () => {
                         {user.profileImg.length > 0 ? (<Avatar src={user.profileImg[0]}
                                                                alt="avatar"/>) : (<Avatar alt="avatar"/>)}
                     </TableCell>
-                    <TableCell align="left">{user.isBan === "false" ? "Yes" : "No"}</TableCell>
+                    <TableCell align="left">{user.isBan ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
-                        <IconButton aria-label="show" color="secondary" onClick={() => ShowPets(user._id)}>
+                        <IconButton aria-label="show" color="secondary" onClick={() => ShowPets(user.email)}>
                             <PetsIcon/>
                         </IconButton>
                         <IconButton aria-label="ban" color="error" onClick={() => handleBan(user._id)}>
@@ -67,25 +71,34 @@ const Dashboard = () => {
                 </TableRow>
             )
         })
+    }else {
+    //     show data not found
+        renderuserList = <TableRow><TableCell align="center" colSpan={8}>No User Found</TableCell></TableRow>;
     }
 
     // event trigger
 
     // show pets
 
-    const ShowPets = (id) => {
-        console.log(id)
+    const ShowPets = (email) => {
+        navigate("/user-pets", {state: {email: email}})
     }
 
     // ban user
-
+    const notify = () => toast.success("Success!");
+    const error = () => toast.error("Error!");
     const handleBan = (id) => {
-        console.log(id)
-        axios.post(`${process.env.REACT_APP_API_URL}/api/users/Ban_and_UnBan`, {_id:id},
-
-            ).then((res) => {
-            if (res.data.success) {
-                window.location.reload();
+        axios.post(`${process.env.REACT_APP_API_URL}/api/users/Ban_and_UnBan`, {_id: id}, config,
+        ).then((res) => {
+            if (res.status) {
+                notify();
+                userList.filter((user) => user._id !== id);
+                let newuserList = userList.map((user) => {
+                    return user._id === id ? {...user, isBan: !user.isBan} : user
+                })
+                setUserlist(newuserList);
+            } else {
+                error();
             }
         })
     }
@@ -93,7 +106,20 @@ const Dashboard = () => {
     // delete user
 
     const handleDelete = (id) => {
-        console.log(id)
+        axios.get(`${process.env.REACT_APP_API_URL}/api/users/delete`, {
+                headers: {Authorization: `Bearer ${isAuth}`},
+                params: {_id: id}
+            },
+        ).then((res) => {
+            if (res.status) {
+                notify();
+                setUserlist(userList.filter((user) => user._id !== id));
+            } else {
+                error();
+            }
+        }).catch((err) => {
+            error();
+        })
     }
 
     return (

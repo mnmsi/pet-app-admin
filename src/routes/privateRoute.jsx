@@ -10,6 +10,7 @@ import CreatePetIdType from "../pages/pet-id-type/create";
 import UpdatePetIdType from "../pages/pet-id-type/edit";
 import PetType from "../pages/pet-type";
 import CreatePetType from "../pages/pet-id-type/create";
+import UserPets from "../pages/user-pets";
 
 function UpdatePetType() {
     return null;
@@ -26,6 +27,8 @@ const PrivateRoute = () => {
         <Routes>
             {navigate}
             <Route path="/" element={<Dashboard/>}/>
+            {/*users*/}
+            <Route path="/user-pets" element={<UserPets/>}/>
             {/*species*/}
             <Route path="/species" element={<Species/>}/>
             <Route path="/species/edit" element={<EditSpecies/>}/>

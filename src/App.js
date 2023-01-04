@@ -19,12 +19,14 @@ function App() {
       navigate("/login");
     }
   }, []);
+
+  console.log(isAuth);
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
-          <Sidebar isSidebar={isAuth} />
+          {isAuth ? <Sidebar /> : null}
           <main className="content">
             <Routes auth={isAuth} />
           </main>
