@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Typography} from "@mui/material";
+import {Avatar, Box, Typography} from "@mui/material";
 import Header from "../../components/Header";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -17,12 +17,14 @@ const UserPets = () => {
     const {state} = useLocation();
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const [petList, setPetList] = useState([]);
+    const [isLoading, setLoading] = useState(true);
     useEffect(() => {
         window.scroll({"top": 0, "behavior": "smooth"});
         axios.get(`${process.env.REACT_APP_API_URL}/api/pet/myPets`,
             {headers: {Authorization: `Bearer ${isAuth}`}, params: {userEmail: state.email}}
         ).then((res) => {
             if (res.data.data) {
+                setLoading(false);
                 setPetList(res.data.data);
             }
         })
@@ -31,10 +33,11 @@ const UserPets = () => {
     let renderPetList = null;
     if (petList.length > 0) {
         renderPetList = petList.map((pet, index) => {
-            console.log(Object.values(pet.lostLocationDetails)?.toString().split(",").join("\n"))
             return (
                 <TableRow key={index}>
+                    <TableCell>{pet.owner?.name}</TableCell>
                     <TableCell>{pet.petName}</TableCell>
+                    <TableCell>{pet.profileImg?.length > 0 ? <Avatar src={pet.profileImg[0]} /> : <Avatar />}</TableCell>
                     <TableCell>{pet.petType.title}</TableCell>
                     <TableCell>{pet.colour}</TableCell>
                     <TableCell>{pet.idInfo}</TableCell>
@@ -42,17 +45,17 @@ const UserPets = () => {
                     <TableCell>{pet.idType.title}</TableCell>
                     <TableCell>{pet.isLost ? "Yes" : "No"}</TableCell>
                     {/*<TableCell>{pet.lostLocation.coordinates[0] + "," +pet.lostLocation.coordinates[0]}</TableCell>*/}
-                    <TableCell><p>Address :  {pet.lostLocationDetails?.address}</p>
-                        <p>StreetNumber :  {pet.lostLocationDetails?.city}</p>
-                        <p>StreetName :  {pet.lostLocationDetails?.streetName}</p>
-                        <p>City : {pet.lostLocationDetails?.streetNumber}</p>
+                    <TableCell><p>Address : {pet.lostLocationDetails?.address ?? "Null" }</p>
+                        <p>StreetNumber : {pet.lostLocationDetails?.streetNumber ?? "Null" }</p>
+                        <p>StreetName : {pet.lostLocationDetails?.streetName ?? "Null" }</p>
+                        <p>City : {pet.lostLocationDetails?.city ?? "Null" }</p>
                     </TableCell>
                     <TableCell>{pet.species?.title}</TableCell>
                 </TableRow>
             )
         })
-    }else{
-        renderPetList = <TableRow><TableCell align="center" colSpan={9}>No Pets Found</TableCell></TableRow>;
+    } else {
+        renderPetList = <TableRow><TableCell align="center" colSpan={11}>No Pets Found</TableCell></TableRow>;
     }
 
     return (
@@ -65,7 +68,9 @@ const UserPets = () => {
                 <Table sx={{minWidth: 650}} aria-label="simple table">
                     <TableHead>
                         <TableRow>
+                            <TableCell>Owner</TableCell>
                             <TableCell>Name</TableCell>
+                            <TableCell>Image</TableCell>
                             <TableCell align="left">Type</TableCell>
                             <TableCell align="left">Color</TableCell>
                             <TableCell align="left">ID Info</TableCell>
@@ -77,7 +82,9 @@ const UserPets = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {renderPetList}
+                        {isLoading ? <TableRow>
+                            <TableCell align="center" colSpan={11}>Loading...</TableCell>
+                        </TableRow> : renderPetList}
                     </TableBody>
                 </Table>
             </TableContainer>

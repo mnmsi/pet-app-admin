@@ -17,6 +17,7 @@ import {toast} from "react-toastify";
 
 const Species = () => {
         const notify = () => toast.success("Success!");
+        const [isLoading, setLoading] = useState(true);
         const error = () => toast.error("Error!");
         useEffect(() => {
             window.scroll({"top": 0, "behavior": "smooth"});
@@ -34,6 +35,7 @@ const Species = () => {
             axios.get(`${process.env.REACT_APP_API_URL}/api/species/list`, config).then((res) => {
                 if (res.data.data) {
                     setSpeciesList(res.data.data);
+                    setLoading(false);
                 }
             }).catch((err) => {
 
@@ -110,7 +112,9 @@ const Species = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {renderSpeciesList}
+                            {isLoading ? <TableRow>
+                                <TableCell align="center" colSpan={3}>Loading...</TableCell>
+                            </TableRow> : renderSpeciesList}
                         </TableBody>
                     </Table>
                 </TableContainer>

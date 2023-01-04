@@ -17,12 +17,10 @@ import {toast} from "react-toastify";
 import {useLocation} from "react-router-dom";
 
 const PetType = () => {
-    const {pathname} = useLocation();
+        const {pathname} = useLocation();
         const notify = () => toast.success("Success!");
         const error = () => toast.error("Error!");
-        useEffect(() => {
-            window.scroll({"top": 0, "behavior": "smooth"});
-        }, [])
+        const [isLoading, setLoading] = useState(true);
         const [speciesList, setSpeciesList] = useState([]);
         const navigate = useNavigate();
         let isAuth = localStorage.getItem("pet-token") ?? null;
@@ -36,13 +34,15 @@ const PetType = () => {
             axios.get(`${process.env.REACT_APP_API_URL}/api/idtype/list`, config).then((res) => {
                 if (res.data.data) {
                     setSpeciesList(res.data.data);
+                    setLoading(false);
                 }
             }).catch((err) => {
-                console.log(err);
+                // console.log(err);
             })
         }
         useEffect(() => {
             getSpecies();
+            window.scroll({"top": 0, "behavior": "smooth"});
         }, [pathname])
         let renderSpeciesList = null;
         if (speciesList.length > 0) {
@@ -112,7 +112,9 @@ const PetType = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {renderSpeciesList}
+                            {isLoading ? <TableRow>
+                                <TableCell colSpan={3} align="center">Loading...</TableCell>
+                            </TableRow> : renderSpeciesList}
                         </TableBody>
                     </Table>
                 </TableContainer>

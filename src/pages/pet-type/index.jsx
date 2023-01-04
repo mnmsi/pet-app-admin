@@ -20,10 +20,8 @@ const PetIdType = () => {
     const {pathname} = useLocation();
         const notify = () => toast.success("Success!");
         const error = () => toast.error("Error!");
-        useEffect(() => {
-            window.scroll({"top": 0, "behavior": "smooth"});
-        }, [])
         const [speciesList, setSpeciesList] = useState([]);
+        const [isLoading, setLoading] = useState(true);
         const navigate = useNavigate();
         let isAuth = localStorage.getItem("pet-token") ?? null;
         const config = {
@@ -36,6 +34,7 @@ const PetIdType = () => {
             axios.get(`${process.env.REACT_APP_API_URL}/api/pettype/list`, config).then((res) => {
                 if (res.data.data) {
                     setSpeciesList(res.data.data);
+                    setLoading(false);
                 }
             }).catch((err) => {
                 console.log(err);
@@ -43,6 +42,7 @@ const PetIdType = () => {
         }
         useEffect(() => {
             getSpecies();
+            window.scroll({"top": 0, "behavior": "smooth"});
         }, [pathname])
 
         let renderSpeciesList = null;
@@ -119,7 +119,9 @@ const PetIdType = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {renderSpeciesList}
+                            {isLoading ? <TableRow>
+                                <TableCell colSpan={4} align="center">Loading...</TableCell>
+                            </TableRow> : renderSpeciesList}
                         </TableBody>
                     </Table>
                 </TableContainer>

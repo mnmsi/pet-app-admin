@@ -20,6 +20,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const [userList, setUserlist] = useState([]);
     const theme = useTheme();
+    const [isLoading, setLoading] = useState(true);
     const colors = tokens(theme.palette.mode);
     let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
@@ -32,6 +33,7 @@ const Dashboard = () => {
         window.scroll({"top": 0, "behavior": "smooth"});
         axios.get(`${process.env.REACT_APP_API_URL}/api/users/list`, config).then((res) => {
             if (res.data.data) {
+                setLoading(false);
                 setUserlist(res.data.data);
             }
         })
@@ -145,7 +147,7 @@ const Dashboard = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {renderuserList}
+                        {isLoading ? <TableRow><TableCell align="center" colSpan={8}>Loading...</TableCell></TableRow> : renderuserList}
                     </TableBody>
                 </Table>
             </TableContainer>
