@@ -38,7 +38,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 
 const Sidebar = () => {
   const { pathname } = useLocation();
-  let pathName = pathname.split("/")[1].slice(0, 1).toUpperCase() + pathname.split("/")[1].slice(1);
+  let pathName = pathname.split("/")[1].slice(0, 1).toUpperCase() + pathname.split("/")[1]?.slice(1);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -140,14 +140,14 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Pet Id Type"
+              title="Petidtype"
               to="/petidtype"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-                title="Pet Type"
+                title="Pettype"
                 to="/pettype"
                 icon={<ReceiptOutlinedIcon />}
                 selected={selected}

@@ -19,6 +19,7 @@ import {useLocation} from "react-router-dom";
 const PetIdType = () => {
     const {pathname} = useLocation();
         const notify = () => toast.success("Success!");
+        const error = () => toast.error("Error!");
         useEffect(() => {
             window.scroll({"top": 0, "behavior": "smooth"});
         }, [])
@@ -43,6 +44,7 @@ const PetIdType = () => {
         useEffect(() => {
             getSpecies();
         }, [pathname])
+
         let renderSpeciesList = null;
         if (speciesList.length > 0) {
             renderSpeciesList = speciesList.map((species, index) => {
@@ -83,14 +85,16 @@ const PetIdType = () => {
         }
         const handleDelete = (id) => {
             axios.get(`${process.env.REACT_APP_API_URL}/api/pettype/admin/delete`,
-                {headers: {Authorization: `Bearer ${isAuth}`}, params: {id: id}}
+                {headers: {Authorization: `Bearer ${isAuth}`}, params: {_id: id}}
             ).then((res) => {
                 if (res.data.status) {
-                    navigate("/pettype");
+                    let newList = speciesList.filter((item) => item._id !== id);
+                    setSpeciesList(newList);
                     notify();
-                    getSpecies();
                 }
-            })
+            }).catch((err) => {
+                error();
+            });
         }
         return (
             <Box m="20px">

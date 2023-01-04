@@ -17,6 +17,7 @@ import {toast} from "react-toastify";
 
 const Species = () => {
         const notify = () => toast.success("Success!");
+        const error = () => toast.error("Error!");
         useEffect(() => {
             window.scroll({"top": 0, "behavior": "smooth"});
         }, [])
@@ -35,7 +36,7 @@ const Species = () => {
                     setSpeciesList(res.data.data);
                 }
             }).catch((err) => {
-                console.log(err);
+
             })
         }
         useEffect(() => {
@@ -76,13 +77,15 @@ const Species = () => {
         }
         const handleDelete = (id) => {
             axios.get(`${process.env.REACT_APP_API_URL}/api/species/admin/delete`,
-                {headers: {Authorization: `Bearer ${isAuth}`}, params: {id: id}}
+                {headers: {Authorization: `Bearer ${isAuth}`}, params: {_id: id}}
             ).then((res) => {
                 if (res.data.status) {
-                    navigate("/species");
+                    let newList = speciesList.filter((item) => item._id !== id);
+                    setSpeciesList(newList);
                     notify();
-                    getSpecies();
                 }
+            }).catch((err) => {
+                error();
             })
         }
         return (
