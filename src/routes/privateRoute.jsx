@@ -6,14 +6,13 @@ import Species from "../pages/species";
 import EditSpecies from "../pages/species/edit";
 import CreateSpecies from "../pages/species/create";
 import PetIdType from "../pages/pet-id-type";
-import CreatePetIdType from "../pages/pet-id-type/create";
+import CreatePetIdType from "../pages/pet-type/create";
 import UpdatePetIdType from "../pages/pet-id-type/edit";
 import PetType from "../pages/pet-type";
 import CreatePetType from "../pages/pet-id-type/create";
 import UserPets from "../pages/user-pets";
 import Pets from "../pages/pets";
 import Distance from "../pages/distance";
-import UpdateDistanceType from "../pages/distance/edit";
 import UpdateDistance from "../pages/distance/edit";
 import UpdatePetType from "../pages/pet-type/edit";
 

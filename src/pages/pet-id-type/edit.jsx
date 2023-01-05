@@ -25,16 +25,18 @@ const UpdatePetIdType = () => {
         window.scroll({"top":0,"behavior":"smooth"});
     },[])
     const handleFormSubmit = (values) => {
+        let formData = new FormData();
+        if(values.title != state.title){
+            formData.append("title",values.title)
+        }
+        formData.append("_id",values.id)
         let config = {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("pet-token")}`,
             }
         }
         axios
-            .post(`${process.env.REACT_APP_API_URL}/api/idtype/admin/update`, {
-                title: values.title,
-                _id: values.id,
-            }, config)
+            .post(`${process.env.REACT_APP_API_URL}/api/idtype/admin/update`,formData, config)
             .then((res) => {
                 if (res.data.status) {
                     set_error(false);

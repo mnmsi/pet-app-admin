@@ -36,7 +36,7 @@ const UpdatePetType = () => {
         }
 
         let formData = new FormData()
-        if (values.title) {
+        if (values.title != state.title) {
             formData.append("title", values.title);
         }
         formData.append("_id", state.id);

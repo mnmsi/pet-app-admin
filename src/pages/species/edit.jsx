@@ -25,16 +25,18 @@ const UpdateSpecies = () => {
         window.scroll({"top":0,"behavior":"smooth"});
     },[])
     const handleFormSubmit = (values) => {
+        let formData = new FormData();
+        if(values.title){
+            formData.append("title",values.title)
+        }
+        formData.append("_id",values.id)
         let config = {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("pet-token")}`,
             }
         }
         axios
-            .post(`${process.env.REACT_APP_API_URL}/api/species/admin/update`, {
-                title: values.title,
-                _id: values.id,
-            }, config)
+            .post(`${process.env.REACT_APP_API_URL}/api/species/admin/update`,formData, config)
             .then((res) => {
                 if (res.data.status) {
                     set_error(false);
@@ -66,7 +68,7 @@ const UpdateSpecies = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Create Species" subtitle=""/>
+                <Header title="Update Species" subtitle=""/>
             </Box>
             <Grid
                 container
