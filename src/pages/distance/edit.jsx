@@ -25,11 +25,6 @@ const UpdateDistance = () => {
         window.scroll({"top":0,"behavior":"smooth"});
     },[])
     const handleFormSubmit = (values) => {
-        let formData = new FormData();
-        if(values.title != state.title){
-            formData.append("distance",Number(values.title))
-        }
-        formData.append("_id",values.id)
         let config = {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("pet-token")}`,
