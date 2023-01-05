@@ -27,7 +27,7 @@ const UpdateDistance = () => {
     const handleFormSubmit = (values) => {
         let formData = new FormData();
         if(values.title != state.title){
-            formData.append("distance",values.title)
+            formData.append("distance",Number(values.title))
         }
         formData.append("_id",values.id)
         let config = {
@@ -36,7 +36,10 @@ const UpdateDistance = () => {
             }
         }
         axios
-            .post(`${process.env.REACT_APP_API_URL}/api/pet/notification/distance/add`, formData, config)
+            .post(`${process.env.REACT_APP_API_URL}/api/pet/notification/distance/add`, {
+                _id:values.id,
+                distance:values.title ?? "",
+            }, config)
             .then((res) => {
                 if (res.data.status) {
                     set_error(false);
@@ -105,8 +108,8 @@ const UpdateDistance = () => {
                                         <TextField
                                             fullWidth
                                             variant="filled"
-                                            type="text"
-                                            label="Title"
+                                            type="number"
+                                            label="Distance"
                                             onBlur={handleBlur}
                                             onChange={handleChange}
                                             value={values.title}
