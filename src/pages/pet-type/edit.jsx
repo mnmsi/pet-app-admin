@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {useLocation} from "react-router";
 import {
     Alert,
     Box,
@@ -14,59 +13,67 @@ import {useNavigate} from "react-router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {Formik} from "formik";
 import * as yup from "yup";
+import {useLocation} from "react-router-dom";
+import Typography from "@mui/material/Typography";
 
-const UpdatePetIdType = () => {
+const UpdatePetType = () => {
     const {state} = useLocation();
+    useEffect(() => {
+        window.scroll({"top": 0, "behavior": "smooth"});
+    }, [])
     const notify = () => toast.success("Success!");
+    const error = () => toast.error("Error!");
     const navigate = useNavigate();
     const [is_error, set_error] = useState(null);
     const isNonMobile = useMediaQuery("(min-width:600px)");
-    useEffect(()=>{
-        window.scroll({"top":0,"behavior":"smooth"});
-    },[])
     const handleFormSubmit = (values) => {
         let config = {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("pet-token")}`,
             }
         }
-        axios
-            .post(`${process.env.REACT_APP_API_URL}/api/idtype/admin/update`, {
-                title: values.title,
-                _id: values.id,
-            }, config)
-            .then((res) => {
-                if (res.data.status) {
-                    set_error(false);
-                    notify();
-                    navigate("/petidtype");
-                }
-            })
-            .catch((err) => {
-                if (err.response.data) {
-                    set_error(err.response.data);
-                }
-            });
+
+        let formData = new FormData()
+        formData.append("title", values.title);
+        formData.append("_id", state.id);
+        if (values.image) {
+            formData.append("img", values.image);
+        }
+        console.log(values);
+        // axios
+        //     .post(`${process.env.REACT_APP_API_URL}/api/pettype/admin/create`, formData
+        //         , config)
+        //     .then((res) => {
+        //         if (res.data.status) {
+        //             set_error(false);
+        //             notify();
+        //             navigate("/pettype");
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         if (err.response.data) {
+        //             set_error(err.response.data);
+        //             error();
+        //         }
+        //     });
         setTimeout(() => {
             set_error(null);
         }, 3000);
     };
-
     const checkoutSchema = yup.object().shape({
         title: yup.string().required("This field required"),
+        // image: yup.string().required("This field required"),
     });
-
-
     const initialValues = {
         title: state.title,
         id: state.id,
+        image: "",
     };
-
 
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Create Species" subtitle=""/>
+                <Header title="Create Pet  Type" subtitle=""/>
             </Box>
             <Grid
                 container
@@ -80,9 +87,9 @@ const UpdatePetIdType = () => {
                             onSubmit={handleFormSubmit}
                             initialValues={initialValues}
                             validationSchema={checkoutSchema}
-                            enableReinitialize={true}
                         >
                             {({
+                                  setFieldValue,
                                   values,
                                   errors,
                                   touched,
@@ -91,6 +98,7 @@ const UpdatePetIdType = () => {
                                   handleSubmit,
                               }) => (
                                 <form onSubmit={handleSubmit}>
+                                    <input type="hidden" name="id" value={values.id}/>
                                     <Box
                                         display="flex"
                                         gap="30px"
@@ -114,10 +122,20 @@ const UpdatePetIdType = () => {
                                             helperText={touched.title && errors.title}
                                             sx={{gridColumn: "span 4"}}
                                         />
-
-                                        <input type="hidden" name="id" onBlur={handleBlur}
-                                               onChange={handleChange}
-                                               value={values.id}/>
+                                        <Typography variant={"h6"} mb={-3} sx={{color: "red"}}>Click bellow to upload
+                                            new one.</Typography>
+                                        <input id="imageFiled" accept="image/svg+xml" onChange={(e) => {
+                                            values.image = e.target.files
+                                            let files = e.target.files[0];
+                                            setFieldValue("image", files);
+                                        }} type="file" name="image" hidden/>
+                                        <Box display="flex" justifyContent="center" alignItems="center" sx={{height:"150px",width:"150px", margin:"0 auto", borderRadius:"50%",border:"2px solid black"}}>
+                                            <img onClick={() => {
+                                                document.getElementById("imageFiled").click();
+                                            }} height="100px" width="100px" src={state.image} alt={state.title}/>
+                                        </Box>
+                                        {errors.image ? <Typography mt={-3} sx={{color: 'red'}}
+                                                                    variant="subtitle1"></Typography> : null}
 
                                     </Box>
                                     {is_error ? (
@@ -147,4 +165,4 @@ const UpdatePetIdType = () => {
     );
 };
 
-export default UpdatePetIdType;
+export default UpdatePetType;

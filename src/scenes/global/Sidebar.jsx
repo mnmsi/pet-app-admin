@@ -94,7 +94,7 @@ const Sidebar = () => {
                                 ml="15px"
                             >
                                 <Typography textAlign="center" variant="h4" color={colors.grey[100]}>
-                                   Pet App Admin Panel
+                                   TBAF App Admin Panel
                                 </Typography>
                             </Box>
                     </MenuItem>
@@ -104,7 +104,7 @@ const Sidebar = () => {
                                 alt="profile-user"
                                 width="100px"
                                 height="100px"
-                                src={`../../assets/user.png`}
+                                src={`../../assets/logo.svg`}
                                 style={{cursor: "pointer", borderRadius: "50%"}}
                             />
                         </Box>
@@ -115,10 +115,10 @@ const Sidebar = () => {
                                 fontWeight="bold"
                                 sx={{m: "10px 0 0 0"}}
                             >
-                                Ed Roh
+                                Admin
                             </Typography>
                             <Typography variant="h5" color={colors.greenAccent[500]}>
-                                VP Fancy Admin
+                                TBAF Admin
                             </Typography>
                         </Box>
                     </Box>

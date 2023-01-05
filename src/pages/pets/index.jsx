@@ -1,5 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Box, FormControl, InputLabel, MenuItem, Pagination, Select, TextField, Typography} from "@mui/material";
+import {
+    Avatar,
+    Box,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Pagination,
+    Select,
+    TextField,
+    Typography
+} from "@mui/material";
 import Header from "../../components/Header";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -8,6 +19,11 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import axios from "axios";
 
 const Pets = () => {
@@ -20,6 +36,7 @@ const Pets = () => {
     let [totalPage, setTotalPage] = useState(0);
     let [select, setSelect] = useState("");
     useEffect(() => {
+
         axios.get(`${process.env.REACT_APP_API_URL}/api/pet/list?lost=${lost}&found=${found}&query=${query}&limit=7&page=${page}`).then((res) => {
             if (res.data.data) {
                 setPage(res.data.data?.currentPage);
@@ -44,12 +61,41 @@ const Pets = () => {
             setFound("");
         }
     }
-
+    // show sighting
+    const [open, setOpen] = useState(false);
+    const [sighting, setSighting] = useState([]);
+    const showLostPetInfo = (pet) => {
+        if (pet.length > 0) {
+            let renderSighting = pet.map((item, index) => {
+                return (
+                    <TableRow key={index}>
+                        <TableCell>{item.name ?? "Null"}</TableCell>
+                        <TableCell>{item.sightedBy}</TableCell>
+                        <TableCell>{item.sightingLocationDetails}</TableCell>
+                        <TableCell>{new Date(item.sightingTime)?.toLocaleTimeString()}</TableCell>
+                        <TableCell>{new Date(item.sightingTime)?.toLocaleDateString("en-US")}</TableCell>
+                    </TableRow>
+                )
+            })
+            setSighting(renderSighting);
+        } else {
+            let renderSighting = (
+                <TableRow>
+                    <TableCell align="center" colSpan={5}>No sighting</TableCell>
+                </TableRow>
+            )
+            setSighting(renderSighting);
+        }
+        setOpen(true);
+    }
+    const handleClose = () => {
+        setOpen(false);
+    }
     let renderPetList = null;
     if (petList.length > 0) {
         renderPetList = petList.map((pet, index) => {
             return (
-                <TableRow key={index}>
+                <TableRow key={index} sx={{cursor: "pointer"}} onClick={() => showLostPetInfo(pet.sighting)}>
                     <TableCell>{pet.owner?.name}</TableCell>
                     <TableCell>{pet.petName}</TableCell>
                     <TableCell>{pet.profileImg?.length > 0 ? <Avatar src={pet.profileImg[0]}/> : <Avatar/>}</TableCell>
@@ -137,6 +183,45 @@ const Pets = () => {
                 <Pagination siblingCount={0} boundaryCount={2} count={totalPage} page={Number(page)}
                             onChange={(e, page) => setPage(page)}/>
             </Box> : null}
+            {/*dialog*/}
+            <div>
+                <Dialog
+                    open={open}
+                    onClose={handleClose}
+                    fullWidth={true}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle sx={{fontSize:"20px",fontWeight:"600"}} id="alert-dialog-title">
+                        {"Sighting Information"}
+                    </DialogTitle>
+                    <Box mx="20px">
+                        <DialogContentText id="alert-dialog-description">
+                            <TableContainer component={Paper}>
+                                <Table aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell sx={{fontWeight:"bold"}}>Sighted By</TableCell>
+                                            <TableCell sx={{fontWeight:"bold"}}>Email</TableCell>
+                                            <TableCell sx={{fontWeight:"bold"}}>Location</TableCell>
+                                            <TableCell sx={{fontWeight:"bold"}}>Time</TableCell>
+                                            <TableCell sx={{fontWeight:"bold"}}>Date</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {sighting}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </DialogContentText>
+                    </Box>
+                    <DialogActions>
+                        <Button onClick={handleClose}>
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
         </Box>
     );
 };

@@ -31,7 +31,7 @@ const Dashboard = () => {
     }
     useLayoutEffect(() => {
         window.scroll({"top": 0, "behavior": "smooth"});
-        axios.get(`${process.env.REACT_APP_API_URL}/api/users/list?page=${page}&limit=1`, config).then((res) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/api/users/list?page=${page}&limit=7`, config).then((res) => {
             if (res.data.data) {
                 setLoading(false);
                 setUserlist(res.data.data?.user_res);

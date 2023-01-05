@@ -37,7 +37,7 @@ const PetIdType = () => {
                     setLoading(false);
                 }
             }).catch((err) => {
-                (err);
+                // error();
             })
         }
         useEffect(() => {
@@ -65,7 +65,7 @@ const PetIdType = () => {
                         </TableCell>
                         <TableCell align="center">
                             <IconButton aria-label="edit" color="secondary"
-                                        onClick={() => handleUpdate(species.title, species._id)}>
+                                        onClick={() => handleUpdate(species.title, species._id,species.img[0])}>
                                 <EditRoundedIcon/>
                             </IconButton>
                             <IconButton aria-label="delete" color="error" onClick={() => handleDelete(species._id)}>
@@ -78,9 +78,9 @@ const PetIdType = () => {
             })
         }
 
-        const handleUpdate = (title, id) => {
+        const handleUpdate = (title, id,image) => {
             navigate(`/pettype/edit`, {
-                state: {id: id, title: title}
+                state: {id: id, title: title,image:image}
             });
         }
         const handleDelete = (id) => {

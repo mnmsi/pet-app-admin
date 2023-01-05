@@ -15,10 +15,8 @@ import Pets from "../pages/pets";
 import Distance from "../pages/distance";
 import UpdateDistanceType from "../pages/distance/edit";
 import UpdateDistance from "../pages/distance/edit";
+import UpdatePetType from "../pages/pet-type/edit";
 
-function UpdatePetType() {
-    return null;
-}
 
 const PrivateRoute = () => {
     const location = useLocation();

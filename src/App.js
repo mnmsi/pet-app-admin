@@ -10,6 +10,7 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    window.scroll({top: 0, left: 0, behavior: 'smooth'});
     let token = localStorage.getItem("pet-token") ?? null;
     if (token) {
       setAuth(true);
