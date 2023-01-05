@@ -38,7 +38,7 @@ const CreatePetType = () => {
         formData.append("img", values.image);
         axios
             .post(`${process.env.REACT_APP_API_URL}/api/pettype/admin/create`, formData
-            , config)
+                , config)
             .then((res) => {
                 if (res.data.status) {
                     set_error(false);
@@ -119,7 +119,9 @@ const CreatePetType = () => {
                                         />
                                         <Typography variant={"h6"} mb={-3} sx={{color: "red"}}>Accept only
                                             svg**</Typography>
-                                        <TextField error={!!touched.image && !!errors.image}
+                                        <TextField inputProps={{
+                                            accept: "image/svg+xml",
+                                        }} error={!!touched.image && !!errors.image}
                                                    helperText={touched.image && errors.image} name="image" type="file"
                                                    accept="" onBlur={handleBlur} onChange={(e) => {
                                             values.image = e.target.files

@@ -15,6 +15,7 @@ import {Formik} from "formik";
 import * as yup from "yup";
 import {useLocation} from "react-router-dom";
 import Typography from "@mui/material/Typography";
+import EditRoundedIcon from "@mui/icons-material/EditRounded";
 
 const UpdatePetType = () => {
     const {state} = useLocation();
@@ -25,6 +26,7 @@ const UpdatePetType = () => {
     const error = () => toast.error("Error!");
     const navigate = useNavigate();
     const [is_error, set_error] = useState(null);
+    const [image, set_image] = useState(state.image);
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const handleFormSubmit = (values) => {
         let config = {
@@ -34,28 +36,29 @@ const UpdatePetType = () => {
         }
 
         let formData = new FormData()
-        formData.append("title", values.title);
+        if (values.title) {
+            formData.append("title", values.title);
+        }
         formData.append("_id", state.id);
         if (values.image) {
             formData.append("img", values.image);
         }
-        console.log(values);
-        // axios
-        //     .post(`${process.env.REACT_APP_API_URL}/api/pettype/admin/create`, formData
-        //         , config)
-        //     .then((res) => {
-        //         if (res.data.status) {
-        //             set_error(false);
-        //             notify();
-        //             navigate("/pettype");
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         if (err.response.data) {
-        //             set_error(err.response.data);
-        //             error();
-        //         }
-        //     });
+        axios
+            .post(`${process.env.REACT_APP_API_URL}/api/pettype/admin/update`, formData
+                , config)
+            .then((res) => {
+                if (res.data.status) {
+                    set_error(false);
+                    notify();
+                    navigate("/pettype");
+                }
+            })
+            .catch((err) => {
+                if (err.response.data) {
+                    set_error(err.response.data);
+                    error();
+                }
+            });
         setTimeout(() => {
             set_error(null);
         }, 3000);
@@ -73,7 +76,7 @@ const UpdatePetType = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Create Pet  Type" subtitle=""/>
+                <Header title="Update Pet Type" subtitle=""/>
             </Box>
             <Grid
                 container
@@ -122,17 +125,30 @@ const UpdatePetType = () => {
                                             helperText={touched.title && errors.title}
                                             sx={{gridColumn: "span 4"}}
                                         />
-                                        <Typography variant={"h6"} mb={-3} sx={{color: "red"}}>Click bellow to upload
-                                            new one.</Typography>
                                         <input id="imageFiled" accept="image/svg+xml" onChange={(e) => {
                                             values.image = e.target.files
                                             let files = e.target.files[0];
+                                            let reader = new FileReader();
+                                            reader.readAsDataURL(files);
+                                            reader.onload = (e) => {
+                                                set_image(e.target.result)
+                                            }
                                             setFieldValue("image", files);
                                         }} type="file" name="image" hidden/>
-                                        <Box display="flex" justifyContent="center" alignItems="center" sx={{height:"150px",width:"150px", margin:"0 auto", borderRadius:"50%",border:"2px solid black"}}>
+                                        <Box display="flex" justifyContent="center" alignItems="center" sx={{
+                                            height: "150px",
+                                            width: "150px",
+                                            margin: "0 auto",
+                                            borderRadius: "50%",
+                                            border: "2px solid black",
+                                            position: "relative"
+                                        }}>
+                                            <Box sx={{position: "absolute", top: "0", right: "0"}}>
+                                                <EditRoundedIcon sx={{fontSize: "20px", color: "black"}}/>
+                                            </Box>
                                             <img onClick={() => {
                                                 document.getElementById("imageFiled").click();
-                                            }} height="100px" width="100px" src={state.image} alt={state.title}/>
+                                            }} height="100px" width="100px" src={image} alt={state.title}/>
                                         </Box>
                                         {errors.image ? <Typography mt={-3} sx={{color: 'red'}}
                                                                     variant="subtitle1"></Typography> : null}

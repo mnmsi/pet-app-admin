@@ -66,7 +66,7 @@ const UpdatePetIdType = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Create Species" subtitle=""/>
+                <Header title="Update Pet Id Type" subtitle=""/>
             </Box>
             <Grid
                 container
