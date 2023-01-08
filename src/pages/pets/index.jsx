@@ -3,7 +3,7 @@ import {
     Avatar,
     Box,
     Button,
-    FormControl,
+    FormControl, IconButton,
     InputLabel,
     MenuItem,
     Pagination,
@@ -21,12 +21,15 @@ import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import axios from "axios";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {toast} from "react-toastify";
 
 const Pets = () => {
+    const notify = () => toast.success("Success!");
+    const error = () => toast.error("Error!");
     let [petList, setPetList] = useState([]);
     let [isLoading, setLoading] = useState(true);
     let [page, setPage] = useState(1);
@@ -64,7 +67,7 @@ const Pets = () => {
     // show sighting
     const [open, setOpen] = useState(false);
     const [sighting, setSighting] = useState([]);
-    const showLostPetInfo = (pet) => {
+    const showLostPetInfo = (e,pet) => {
         if (pet.length > 0) {
             let renderSighting = pet.map((item, index) => {
                 return (
@@ -91,11 +94,31 @@ const Pets = () => {
     const handleClose = () => {
         setOpen(false);
     }
+    // delete pet
+    let isAuth = localStorage.getItem("pet-token") ?? null;
+    const handleDelete = (e,id) => {
+        e.stopPropagation();
+        axios.get(`${process.env.REACT_APP_API_URL}/api/pet/delete`, {
+                headers: {Authorization: `Bearer ${isAuth}`},
+                params: {_id: id}
+            },
+        ).then((res) => {
+            if (res.status) {
+                notify();
+                setPetList(petList.filter((pet) => pet._id !== id));
+            } else {
+                error();
+            }
+        }).catch((err) => {
+            error();
+        })
+
+    }
     let renderPetList = null;
     if (petList.length > 0) {
         renderPetList = petList.map((pet, index) => {
             return (
-                <TableRow key={index} sx={{cursor: "pointer"}} onClick={() => showLostPetInfo(pet.sighting)}>
+                <TableRow key={index} sx={{cursor: "pointer"}} onClick={(e) => showLostPetInfo(e, pet.sighting)}>
                     <TableCell>{pet.owner?.name}</TableCell>
                     <TableCell>{pet.petName}</TableCell>
                     <TableCell>{pet.profileImg?.length > 0 ? <Avatar src={pet.profileImg[0]}/> : <Avatar/>}</TableCell>
@@ -112,6 +135,11 @@ const Pets = () => {
                         <p>City : {pet.lostLocationDetails?.city ?? "Null"}</p>
                     </TableCell>
                     <TableCell>{pet.species?.title}</TableCell>
+                    <TableCell>
+                        <IconButton aria-label="delete" color="warning" onClick={(e) => handleDelete(e,pet._id)}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </TableCell>
                 </TableRow>
             )
         })
@@ -167,6 +195,7 @@ const Pets = () => {
                             <TableCell align="left">Lost Status</TableCell>
                             <TableCell align="left">Lost Location</TableCell>
                             <TableCell align="left">Species</TableCell>
+                            <TableCell align="center">Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
