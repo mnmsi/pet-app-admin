@@ -13,15 +13,16 @@ import PetsIcon from '@mui/icons-material/Pets';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import {useNavigate,useLocation} from "react-router-dom";
 import {toast} from "react-toastify";
 
 const Dashboard = () => {
     const navigate = useNavigate();
+    const local_page = localStorage.getItem("page") ?? 1;
     const [userList, setUserlist] = useState([]);
     const [isLoading, setLoading] = useState(true);
     let [totalPage, setTotalPage] = useState(0);
-    let [page, setPage] = useState(1);
+    let [page, setPage] = useState(local_page);
     let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const config = {
@@ -103,6 +104,8 @@ const Dashboard = () => {
             } else {
                 error();
             }
+        }).catch((err)=>{
+           toast.error(err.response.data.message)
         })
     }
 
@@ -121,8 +124,14 @@ const Dashboard = () => {
                 error();
             }
         }).catch((err) => {
-            error();
+            toast.error(err.response.data.message)
         })
+    }
+
+    // pagination
+    const handlePagination = (e, page) => {
+        localStorage.setItem("page", page);
+        setPage(page);
     }
 
     return (
@@ -159,7 +168,7 @@ const Dashboard = () => {
             </TableContainer>
             {Number(totalPage) > 1 ? <Box display="flex" justifyContent="flex-end" sx={{mt: 2}}>
                 <Pagination siblingCount={0} boundaryCount={2} count={totalPage} page={Number(page)}
-                            onChange={(e, page) => setPage(page)}/>
+                            onChange={(e, page) => handlePagination(e,page)}/>
             </Box> : null}
         </Box>
     );

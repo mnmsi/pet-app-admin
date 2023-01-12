@@ -43,6 +43,7 @@ const Sidebar = () => {
     const [selected, setSelected] = useState(pathName ? pathName : "Dashboard");
     // logout
     const logout = () => {
+
         let token = localStorage.getItem("pet-token");
         axios.get(`${process.env.REACT_APP_API_URL}/api/users/logout`, {
             headers: {
@@ -57,7 +58,8 @@ const Sidebar = () => {
             }
         }).catch((err) => {
             if (err) {
-                error();
+                window.location.href = "/login";
+                window.location.reload();
             }
         })
     }
