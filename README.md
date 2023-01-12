@@ -1,4 +1,3 @@
-# React Admin Dashboard
+# Pet APP Admin Dashboard
 
-Completed React Admin Dashboard Repo
 
