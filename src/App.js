@@ -31,7 +31,6 @@ function App() {
                 setAuth(false);
                 navigate("/login");
             }
-
         });
     }, [pathname]);
     return (

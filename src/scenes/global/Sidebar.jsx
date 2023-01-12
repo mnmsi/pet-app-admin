@@ -14,7 +14,7 @@ import TypeSpecimenIcon from '@mui/icons-material/TypeSpecimen';
 import CatchingPokemonIcon from '@mui/icons-material/CatchingPokemon';
 import {toast} from 'react-toastify';
 
-const Item = ({title, to, icon, selected, setSelected,onClick}) => {
+const Item = ({title, to, icon, selected, setSelected}) => {
 
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -34,7 +34,6 @@ const Item = ({title, to, icon, selected, setSelected,onClick}) => {
 };
 
 const Sidebar = () => {
-    const [searchParams] = useSearchParams();
     const notify = () => toast.success("You are logged out!");
     const error = () => toast.error("Something went wrong!");
     const {pathname} = useLocation();
@@ -65,6 +64,9 @@ const Sidebar = () => {
             }
         })
     }
+    const handleLocalStorage = () => {
+        localStorage.removeItem("page");
+    }
     return (
         <Box
             sx={{
@@ -85,7 +87,7 @@ const Sidebar = () => {
                 },
             }}
         >
-            <ProSidebar >
+            <ProSidebar>
                 <Menu iconShape="square">
                     {/* LOGO AND MENU ICON */}
                     <MenuItem
@@ -94,13 +96,13 @@ const Sidebar = () => {
                             color: colors.grey[100],
                         }}
                     >
-                            <Box
-                                ml="15px"
-                            >
-                                <Typography textAlign="center" variant="h4" color={colors.grey[100]}>
-                                   TBAF App Admin Panel
-                                </Typography>
-                            </Box>
+                        <Box
+                            ml="15px"
+                        >
+                            <Typography textAlign="center" variant="h4" color={colors.grey[100]}>
+                                TBAF App Admin Panel
+                            </Typography>
+                        </Box>
                     </MenuItem>
                     <Box mb="25px">
                         <Box display="flex" justifyContent="center" alignItems="center">
@@ -129,14 +131,16 @@ const Sidebar = () => {
 
                     <Box paddingLeft={"10%"}>
 
-                        <Item
-                            title="Dashboard"
-                            to={searchParams.get("page") ? `/?page=${searchParams.get("page")}` : "/"}
-                            icon={<HomeOutlinedIcon/>}
-                            selected={selected}
-                            setSelected={setSelected}
+                        <Box onClick={handleLocalStorage}>
+                            <Item
+                                title="Dashboard"
+                                to="/"
+                                icon={<HomeOutlinedIcon/>}
+                                selected={selected}
+                                setSelected={setSelected}
 
-                        />
+                            />
+                        </Box>
                         <Item
                             title="Pets"
                             to="/pets"

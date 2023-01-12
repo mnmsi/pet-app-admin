@@ -12,16 +12,16 @@ import PetsIcon from '@mui/icons-material/Pets';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import axios from "axios";
-import {useNavigate,useSearchParams } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import {toast} from "react-toastify";
 
 const Dashboard = () => {
-    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    let localpage = localStorage.getItem("page") ?? 1;
     const [userList, setUserlist] = useState([]);
     const [isLoading, setLoading] = useState(true);
     let [totalPage, setTotalPage] = useState(0);
-    let [page, setPage] = useState(searchParams.get("page") ?? 1);
+    let [page, setPage] = useState(localpage);
     let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const config = {
@@ -84,7 +84,8 @@ const Dashboard = () => {
     // show pets
 
     const ShowPets = (email) => {
-        navigate(`/user-pets?page=${page}`, {state: {email: email}});
+        navigate(`/user-pets`, {state: {email: email}});
+
     }
 
     // ban user
@@ -130,6 +131,7 @@ const Dashboard = () => {
     // pagination
     const handlePagination = (e, page) => {
         setPage(page);
+        localStorage.setItem("page", page);
     }
 
     return (
