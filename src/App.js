@@ -33,6 +33,9 @@ function App() {
             }
         });
     }, [pathname]);
+    window.onpopstate = (e) => {
+        window.location.reload();
+    };
     return (
         <ColorModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
