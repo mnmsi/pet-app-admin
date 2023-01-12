@@ -1,5 +1,4 @@
-import {Avatar, Box, Button, IconButton, Pagination, Skeleton, Typography, useTheme} from "@mui/material";
-import {tokens} from "../theme";
+import {Avatar, Box, IconButton, Pagination, Typography} from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,21 +7,21 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Header from "../components/Header";
-import {useEffect, useState,useLayoutEffect } from "react";
+import {useEffect, useState } from "react";
 import PetsIcon from '@mui/icons-material/Pets';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import axios from "axios";
-import {useNavigate,useLocation} from "react-router-dom";
+import {useNavigate,useSearchParams } from "react-router-dom";
 import {toast} from "react-toastify";
 
 const Dashboard = () => {
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const local_page = localStorage.getItem("page") ?? 1;
     const [userList, setUserlist] = useState([]);
     const [isLoading, setLoading] = useState(true);
     let [totalPage, setTotalPage] = useState(0);
-    let [page, setPage] = useState(local_page);
+    let [page, setPage] = useState(searchParams.get("page") ?? 1);
     let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const config = {
@@ -30,7 +29,7 @@ const Dashboard = () => {
             Authorization: `Bearer ${isAuth}`
         }
     }
-    useLayoutEffect(() => {
+    useEffect(() => {
         window.scroll({"top": 0, "behavior": "smooth"});
         axios.get(`${process.env.REACT_APP_API_URL}/api/users/list?page=${page}&limit=7`, config).then((res) => {
             if (res.data.data) {
@@ -85,7 +84,7 @@ const Dashboard = () => {
     // show pets
 
     const ShowPets = (email) => {
-        navigate("/user-pets", {state: {email: email}})
+        navigate(`/user-pets?page=${page}`, {state: {email: email}});
     }
 
     // ban user
@@ -130,7 +129,6 @@ const Dashboard = () => {
 
     // pagination
     const handlePagination = (e, page) => {
-        localStorage.setItem("page", page);
         setPage(page);
     }
 

@@ -10,11 +10,13 @@ import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import {useLocation} from "react-router-dom";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import {useNavigate,useSearchParams} from "react-router-dom";
 
 const UserPets = () => {
     // const {navigate} = useNavigate();
     const {state} = useLocation();
+    const [searchParams,setSearchParams] = useSearchParams();
+    console.log(searchParams.get("page"));
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const [petList, setPetList] = useState([]);
     const [isLoading, setLoading] = useState(true);

@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {ProSidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {Box, Button, Typography, useTheme} from "@mui/material";
-import {Link, useLocation} from "react-router-dom";
+import {Link, useLocation, useSearchParams} from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import {tokens} from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -14,7 +14,7 @@ import TypeSpecimenIcon from '@mui/icons-material/TypeSpecimen';
 import CatchingPokemonIcon from '@mui/icons-material/CatchingPokemon';
 import {toast} from 'react-toastify';
 
-const Item = ({title, to, icon, selected, setSelected}) => {
+const Item = ({title, to, icon, selected, setSelected,onClick}) => {
 
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -34,6 +34,7 @@ const Item = ({title, to, icon, selected, setSelected}) => {
 };
 
 const Sidebar = () => {
+    const [searchParams] = useSearchParams();
     const notify = () => toast.success("You are logged out!");
     const error = () => toast.error("Something went wrong!");
     const {pathname} = useLocation();
@@ -58,6 +59,7 @@ const Sidebar = () => {
             }
         }).catch((err) => {
             if (err) {
+                notify();
                 window.location.href = "/login";
                 window.location.reload();
             }
@@ -126,12 +128,14 @@ const Sidebar = () => {
                     </Box>
 
                     <Box paddingLeft={"10%"}>
+
                         <Item
                             title="Dashboard"
-                            to="/"
+                            to={searchParams.get("page") ? `/?page=${searchParams.get("page")}` : "/"}
                             icon={<HomeOutlinedIcon/>}
                             selected={selected}
                             setSelected={setSelected}
+
                         />
                         <Item
                             title="Pets"
