@@ -25,6 +25,7 @@ const Login = () => {
       .then((res) => {
         if (res.data.status) {
           localStorage.setItem("pet-token", res.data?.data?.remember_token);
+          localStorage.removeItem("page");
           set_error(false);
           notify();
           navigate("/");
