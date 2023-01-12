@@ -9,7 +9,6 @@ import axios from "axios";
 function App() {
     const [theme, colorMode] = useMode();
     const {pathname} = useLocation();
-    (pathname);
     const [isAuth, setAuth] = useState(null);
     const navigate = useNavigate();
 
