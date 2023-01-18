@@ -94,12 +94,14 @@ const PetType = () => {
                 {headers: {Authorization: `Bearer ${isAuth}`}, params: {_id: id}}
             ).then((res) => {
                 if (res.data.status) {
+                    setIsDeleteAlert(false)
                     let newList = speciesList.filter((item) => item._id !== id);
                     setSpeciesList(newList);
                     notify();
                 }
             }).catch((err) => {
                 error();
+                setIsDeleteAlert(false)
             })
         }
         return (
