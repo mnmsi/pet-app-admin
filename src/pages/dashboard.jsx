@@ -17,15 +17,24 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Header from "../components/Header";
-import React, {useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import PetsIcon from '@mui/icons-material/Pets';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import axios from "axios";
-import {useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 const Dashboard = () => {
+    const [isBanAlert, setIsBanAlert] = useState(false);
+    const [isDeleteAlert, setIsDeleteAlert] = useState(false);
+    const [modalData, setModalData] = useState([]);
     const navigate = useNavigate();
     let localpage = localStorage.getItem("page") ?? 1;
     const [userList, setUserlist] = useState([]);
@@ -67,8 +76,9 @@ const Dashboard = () => {
                     <TableCell align="left">{user.city ? user.city : "NULL"}</TableCell>
                     <TableCell align="left">{user.country ? user.country : "NULL"}</TableCell>
                     <TableCell align="left">
-                        {user.profileImg.length > 0 ? (<Avatar  src={user.profileImg[0]}
-                                                               alt={user.name?.toUpperCase()}/>) : (<Avatar alt={user.name?.toUpperCase()}/>)}
+                        {user.profileImg.length > 0 ? (<Avatar src={user.profileImg[0]}
+                                                               alt={user.name?.toUpperCase()}/>) : (
+                            <Avatar alt={user.name?.toUpperCase()}/>)}
                     </TableCell>
                     <TableCell align="left">{user.isBan ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
@@ -105,26 +115,21 @@ const Dashboard = () => {
     const notify = () => toast.success("Success!");
     const error = () => toast.error("Error!");
     const handleBan = (id) => {
-        axios.post(`${process.env.REACT_APP_API_URL}/api/users/Ban_and_UnBan`, {_id: id}, config,
-        ).then((res) => {
-            if (res.status) {
-                notify();
-                userList.filter((user) => user._id !== id);
-                let newuserList = userList.map((user) => {
-                    return user._id === id ? {...user, isBan: !user.isBan} : user
-                })
-                setUserlist(newuserList);
-            } else {
-                error();
-            }
-        }).catch((err)=>{
-           toast.error(err.response.data.message)
-        })
+        setIsBanAlert(true);
+        let data = userList.filter((user) => user._id === id);
+        setModalData(data[0]);
+
     }
 
     // delete user
 
     const handleDelete = (id) => {
+        setIsDeleteAlert(true);
+        let data = userList.filter((user) => user._id === id);
+        setModalData(data[0]);
+    }
+
+    const handleDeleteAction = (id) => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/users/delete`, {
                 headers: {Authorization: `Bearer ${isAuth}`},
                 params: {_id: id}
@@ -132,12 +137,15 @@ const Dashboard = () => {
         ).then((res) => {
             if (res.status) {
                 notify();
+                setIsDeleteAlert(false);
                 setUserlist(userList.filter((user) => user._id !== id));
             } else {
                 error();
+                setIsDeleteAlert(false);
             }
         }).catch((err) => {
             toast.error(err.response.data.message)
+            setIsDeleteAlert(false);
         })
     }
 
@@ -145,6 +153,28 @@ const Dashboard = () => {
     const handlePagination = (e, page) => {
         setPage(page);
         localStorage.setItem("page", page);
+    }
+
+    const HandleAction = (id) => {
+        axios.post(`${process.env.REACT_APP_API_URL}/api/users/Ban_and_UnBan`, {_id: id}, config,
+        ).then((res) => {
+            if (res.status) {
+                notify();
+                setIsBanAlert(false);
+                userList.filter((user) => user._id !== id);
+                let newuserList = userList.map((user) => {
+                    return user._id === id ? {...user, isBan: !user.isBan} : user
+                })
+                setUserlist(newuserList);
+            } else {
+                error();
+                setIsBanAlert(false);
+            }
+        }).catch((err) => {
+            setIsBanAlert(false);
+            toast.error(err.response.data.message)
+        })
+
     }
 
     return (
@@ -155,7 +185,7 @@ const Dashboard = () => {
             </Box>
             {/* start user section */}
             <Typography variant="h1" sx={{mt: 2, mb: 1}}>User List</Typography>
-            <Box mt="10px" mb="10px" display="flex" justifyContent="end"   sx={{}}>
+            <Box mt="10px" mb="10px" display="flex" justifyContent="end" sx={{}}>
                 <FormControl variant="outlined" sx={{minWidth: 300}}>
                     <InputLabel id="demo-simple-select-outlined-label">Limit</InputLabel>
                     <Select
@@ -165,7 +195,7 @@ const Dashboard = () => {
                         label="Limit"
                         onChange={handleLimit}
                     >
-                        <MenuItem  value="5">5</MenuItem>
+                        <MenuItem value="5">5</MenuItem>
                         <MenuItem selected value="10">10</MenuItem>
                         <MenuItem value="15">15</MenuItem>
                         <MenuItem value="20">20</MenuItem>
@@ -175,7 +205,7 @@ const Dashboard = () => {
                 </FormControl>
             </Box>
             <TableContainer component={Paper}>
-                <Table sx={{minWidth: 650}} aria-label="simple table">
+                <Table aria-label="simple table">
                     <TableHead>
                         <TableRow>
                             <TableCell>Name</TableCell>
@@ -200,8 +230,60 @@ const Dashboard = () => {
             </TableContainer>
             {Number(totalPage) > 1 ? <Box display="flex" justifyContent="flex-end" sx={{mt: 2}}>
                 <Pagination siblingCount={0} boundaryCount={2} count={totalPage} page={Number(page)}
-                            onChange={(e, page) => handlePagination(e,page)}/>
+                            onChange={(e, page) => handlePagination(e, page)}/>
             </Box> : null}
+            {/* modal */}
+            <Dialog
+                fullWidth={true}
+                open={isBanAlert}
+                maxWidth={'xs'}
+                onClose={() => setIsBanAlert(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{fontSize: '18px'}}>
+                    Alert!
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" sx={{fontSize: "16px"}}>
+                        {`Are you sure you want to ${modalData?.isBan ? 'unban' : 'ban'} user `} <span
+                        style={{fontWeight: "bold"}}>{modalData.name}?</span>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="primary" onClick={() => setIsBanAlert(false)}>Cancel</Button>
+                    {modalData?.isBan ? <Button variant="contained" color="error"
+                                                onClick={() => HandleAction(modalData._id)}>Unban</Button> :
+                        <Button variant="contained" color="error"
+                                onClick={() => HandleAction(modalData._id)}>Ban</Button>}
+                </DialogActions>
+            </Dialog>
+            {/*delete*/}
+            <Dialog
+                fullWidth={true}
+                maxWidth={'xs'}
+                open={isDeleteAlert}
+                onClose={() => setIsDeleteAlert(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{fontSize: '18px'}}>
+                    Alert!
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" sx={{fontSize: "16px"}}>
+                        Are you sure you want to delete user <span
+                        style={{fontWeight: "bold"}}>{modalData.name}?</span> This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="primary" onClick={() => setIsDeleteAlert(false)}>Cancel</Button>
+
+                        <Button variant="contained" color="error"
+                                onClick={() => handleDeleteAction(modalData._id)}>Delete</Button>
+                </DialogActions>
+            </Dialog>
+            {/*    delete*/}
         </Box>
     );
 };
