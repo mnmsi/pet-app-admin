@@ -55,17 +55,21 @@ const Sidebar = () => {
                 localStorage.removeItem("pet-token");
                 window.location.href = "/login";
                 window.location.reload();
+                handleLocalStorage();
             }
         }).catch((err) => {
             if (err) {
                 notify();
                 window.location.href = "/login";
                 window.location.reload();
+                handleLocalStorage();
             }
         })
     }
     const handleLocalStorage = () => {
         localStorage.removeItem("page");
+        localStorage.removeItem("limit");
+        window.location.reload();
     }
     return (
         <Box

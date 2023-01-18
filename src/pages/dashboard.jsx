@@ -37,10 +37,12 @@ const Dashboard = () => {
     const [modalData, setModalData] = useState([]);
     const navigate = useNavigate();
     let localpage = localStorage.getItem("page") ?? 1;
+    let locallimit = localStorage.getItem("limit") ?? 10;
+    console.log(locallimit)
     const [userList, setUserlist] = useState([]);
     const [isLoading, setLoading] = useState(true);
     let [totalPage, setTotalPage] = useState(0);
-    let [limit, setLimit] = useState(10);
+    let [limit, setLimit] = useState(locallimit);
     let [page, setPage] = useState(localpage);
     let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
@@ -66,6 +68,7 @@ const Dashboard = () => {
             return (
                 <TableRow
                     key={index}
+                    className={user?.isBan ? 'ban-row' : ''}
                     sx={{'&:last-child td, &:last-child th': {border: 0}}}
                 >
                     <TableCell component="th" scope="row">
@@ -103,6 +106,7 @@ const Dashboard = () => {
     // event trigger
     const handleLimit = (e) => {
         setLimit(e.target.value);
+        localStorage.setItem("limit", e.target.value);
     }
     // show pets
 
@@ -195,12 +199,12 @@ const Dashboard = () => {
                         label="Limit"
                         onChange={handleLimit}
                     >
-                        <MenuItem value="5">5</MenuItem>
-                        <MenuItem selected value="10">10</MenuItem>
-                        <MenuItem value="15">15</MenuItem>
-                        <MenuItem value="20">20</MenuItem>
-                        <MenuItem value="25">25</MenuItem>
-                        <MenuItem value="30">30</MenuItem>
+                        <MenuItem selected={limit === 5 ? true : false} value="5">5</MenuItem>
+                        <MenuItem selected={limit === 10 ? true : false} value="10">10</MenuItem>
+                        <MenuItem selected={limit === 15 ? true : false} value="15">15</MenuItem>
+                        <MenuItem selected={limit === 20 ? true : false} value="20">20</MenuItem>
+                        <MenuItem selected={limit === 25 ? true : false} value="25">25</MenuItem>
+                        <MenuItem selected={limit === 30 ? true : false} value="30">30</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
@@ -279,8 +283,8 @@ const Dashboard = () => {
                 <DialogActions>
                     <Button variant="contained" color="primary" onClick={() => setIsDeleteAlert(false)}>Cancel</Button>
 
-                        <Button variant="contained" color="error"
-                                onClick={() => handleDeleteAction(modalData._id)}>Delete</Button>
+                    <Button variant="contained" color="error"
+                            onClick={() => handleDeleteAction(modalData._id)}>Delete</Button>
                 </DialogActions>
             </Dialog>
             {/*    delete*/}
