@@ -26,6 +26,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {toast} from "react-toastify";
+import DialogContent from "@mui/material/DialogContent";
 
 const Pets = () => {
     const notify = () => toast.success("Success!");
@@ -36,6 +37,8 @@ const Pets = () => {
     let [found, setFound] = useState("");
     let [lost, setLost] = useState("");
     let [query, setQuery] = useState("");
+    const [modalData,setModalData] = useState({});
+    const [isDeleteAlert, setIsDeleteAlert] = React.useState(false);
     let [totalPage, setTotalPage] = useState(0);
     let [select, setSelect] = useState("");
     let [limit, setLimit] = useState(10);
@@ -110,22 +113,33 @@ const Pets = () => {
     let isAuth = localStorage.getItem("pet-token") ?? null;
     const handleDelete = (e, id) => {
         e.stopPropagation();
+        setIsDeleteAlert(true);
+        let data = petList?.filter((item) => item._id === id);
+        setModalData(data[0]);
+    }
+
+    console.log(modalData);
+
+    const handleDeleteAction = (id) => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/pet/delete`, {
                 headers: {Authorization: `Bearer ${isAuth}`},
                 params: {_id: id}
             },
         ).then((res) => {
             if (res.status) {
+                setIsDeleteAlert(false);
                 notify();
                 setPetList(petList.filter((pet) => pet._id !== id));
             } else {
                 error();
+                setIsDeleteAlert(false);
             }
         }).catch((err) => {
             error();
+            setIsDeleteAlert(false);
         })
-
     }
+
     let renderPetList = null;
     if (petList.length > 0) {
         renderPetList = petList.map((pet, index) => {
@@ -283,6 +297,32 @@ const Pets = () => {
                     </DialogActions>
                 </Dialog>
             </div>
+            {/*delete*/}
+            <Dialog
+                fullWidth={true}
+                maxWidth={'xs'}
+                open={isDeleteAlert}
+                onClose={() => setIsDeleteAlert(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{fontSize: '18px'}}>
+                    Alert!
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description" sx={{fontSize: "16px"}}>
+                        Are you sure you want to delete pet <span
+                        style={{fontWeight: "bold"}}>{modalData?.petName}?</span> This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="primary" onClick={() => setIsDeleteAlert(false)}>Cancel</Button>
+
+                    <Button variant="contained" color="error"
+                            onClick={() => handleDeleteAction(modalData._id)}>Delete</Button>
+                </DialogActions>
+            </Dialog>
+            {/*    delete*/}
         </Box>
     );
 };

@@ -15,6 +15,11 @@ import {Delete} from "@mui/icons-material";
 import {Link, useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
 import {useLocation} from "react-router-dom";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
 
 const PetIdType = () => {
     const {pathname} = useLocation();
@@ -23,6 +28,9 @@ const PetIdType = () => {
         const [speciesList, setSpeciesList] = useState([]);
         const [isLoading, setLoading] = useState(true);
         const navigate = useNavigate();
+        const [isDeleteAlert,setIsDeleteAlert] = useState(false);
+        const [modalData,setModalData] = useState([]);
+
         let isAuth = localStorage.getItem("pet-token") ?? null;
         const config = {
             headers: {
@@ -84,16 +92,23 @@ const PetIdType = () => {
             });
         }
         const handleDelete = (id) => {
+            setIsDeleteAlert(true);
+           let data = speciesList.filter((item) => item._id === id);
+           setModalData(data[0]);
+        }
+        const handleDeleteAction = (id) => {
             axios.get(`${process.env.REACT_APP_API_URL}/api/pettype/admin/delete`,
                 {headers: {Authorization: `Bearer ${isAuth}`}, params: {_id: id}}
             ).then((res) => {
                 if (res.data.status) {
+                    setIsDeleteAlert(false);
                     let newList = speciesList.filter((item) => item._id !== id);
                     setSpeciesList(newList);
                     notify();
                 }
             }).catch((err) => {
                 error();
+                setIsDeleteAlert(false);
             });
         }
         return (
@@ -125,6 +140,32 @@ const PetIdType = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                {/*delete*/}
+                <Dialog
+                    fullWidth={true}
+                    maxWidth={'xs'}
+                    open={isDeleteAlert}
+                    onClose={() => setIsDeleteAlert(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title" sx={{fontSize: '18px'}}>
+                        Alert!
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description" sx={{fontSize: "16px"}}>
+                            Are you sure you want to delete species <span
+                            style={{fontWeight: "bold"}}>{modalData?.title}?</span> This action cannot be undone.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="contained" color="primary" onClick={() => setIsDeleteAlert(false)}>Cancel</Button>
+
+                        <Button variant="contained" color="error"
+                                onClick={() => handleDeleteAction(modalData._id)}>Delete</Button>
+                    </DialogActions>
+                </Dialog>
+                {/*    delete*/}
             </Box>
         );
     }
