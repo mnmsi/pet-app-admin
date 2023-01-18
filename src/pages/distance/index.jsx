@@ -56,9 +56,11 @@ const Distance = () => {
                         <TableCell component="th" scope="row">
                             {species.distance ? species.distance : "NULL"}
                         </TableCell>
-
+                        <TableCell align="center">
+                            <b>{`Users within a ${species.distance} kilometer radius of the location where the pet went missing will be notified.`}</b>
+                        </TableCell>
                         <TableCell
-                            align="left">{species.createdAt ? new Date(species.createdAt).toDateString() : "NULL"}</TableCell>
+                            align="left">{species.updatedAt ? new Date(species.updatedAt).toDateString() : "NULL"}</TableCell>
                         <TableCell align="center">
                             <IconButton aria-label="edit" color="secondary"
                                         onClick={() => handleUpdate(species.distance, species._id)}>
@@ -74,19 +76,19 @@ const Distance = () => {
                 state: {id: id, title: title}
             });
         }
-        const handleDelete = (id) => {
-            axios.get(`${process.env.REACT_APP_API_URL}/api/pettype/admin/delete`,
-                {headers: {Authorization: `Bearer ${isAuth}`}, params: {_id: id}}
-            ).then((res) => {
-                if (res.data.status) {
-                    let newList = speciesList.filter((item) => item._id !== id);
-                    setSpeciesList(newList);
-                    notify();
-                }
-            }).catch((err) => {
-                error();
-            });
-        }
+        // const handleDelete = (id) => {
+        //     axios.get(`${process.env.REACT_APP_API_URL}/api/pettype/admin/delete`,
+        //         {headers: {Authorization: `Bearer ${isAuth}`}, params: {_id: id}}
+        //     ).then((res) => {
+        //         if (res.data.status) {
+        //             let newList = speciesList.filter((item) => item._id !== id);
+        //             setSpeciesList(newList);
+        //             notify();
+        //         }
+        //     }).catch((err) => {
+        //         error();
+        //     });
+        // }
         return (
             <Box m="20px">
                 {/* HEADER */}
@@ -95,12 +97,13 @@ const Distance = () => {
                     {/*    create new button */}
                 </Box>
                 {/* start user section */}
-                <Typography variant="h2" sx={{mt: 2, mb: 1}}>Distance</Typography>
+                <Typography variant="h2" sx={{mt: 2, mb: 1}}>Notification Distance</Typography>
                 <TableContainer component={Paper}>
                     <Table sx={{minWidth: 650}} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Title</TableCell>
+                                <TableCell>Distance</TableCell>
+                                <TableCell align="center">Description</TableCell>
                                 <TableCell align="left">Created At</TableCell>
                                 <TableCell align="center">Action</TableCell>
                             </TableRow>

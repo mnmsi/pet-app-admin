@@ -1,4 +1,14 @@
-import {Avatar, Box, IconButton, Pagination, Typography} from "@mui/material";
+import {
+    Avatar,
+    Box,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Pagination,
+    Select,
+    Typography
+} from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,7 +17,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Header from "../components/Header";
-import {useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import PetsIcon from '@mui/icons-material/Pets';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
@@ -21,6 +31,7 @@ const Dashboard = () => {
     const [userList, setUserlist] = useState([]);
     const [isLoading, setLoading] = useState(true);
     let [totalPage, setTotalPage] = useState(0);
+    let [limit, setLimit] = useState(10);
     let [page, setPage] = useState(localpage);
     let renderuserList = null;
     let isAuth = localStorage.getItem("pet-token") ?? null;
@@ -31,7 +42,7 @@ const Dashboard = () => {
     }
     useEffect(() => {
         window.scroll({"top": 0, "behavior": "smooth"});
-        axios.get(`${process.env.REACT_APP_API_URL}/api/users/list?page=${page}&limit=7`, config).then((res) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/api/users/list?page=${page}&limit=${limit}`, config).then((res) => {
             if (res.data.data) {
                 setLoading(false);
                 setUserlist(res.data.data?.user_res);
@@ -39,7 +50,7 @@ const Dashboard = () => {
                 setTotalPage(res.data.data?.totalPages);
             }
         })
-    }, [page])
+    }, [page, limit]);
 
     if (userList.length > 0) {
         renderuserList = userList.map((user, index) => {
@@ -80,7 +91,9 @@ const Dashboard = () => {
     }
 
     // event trigger
-
+    const handleLimit = (e) => {
+        setLimit(e.target.value);
+    }
     // show pets
 
     const ShowPets = (email) => {
@@ -142,6 +155,25 @@ const Dashboard = () => {
             </Box>
             {/* start user section */}
             <Typography variant="h1" sx={{mt: 2, mb: 1}}>User List</Typography>
+            <Box mt="10px" mb="10px" display="flex" justifyContent="end"   sx={{}}>
+                <FormControl variant="outlined" sx={{minWidth: 300}}>
+                    <InputLabel id="demo-simple-select-outlined-label">Limit</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-outlined-label"
+                        id="demo-simple-select-outlined"
+                        value={limit}
+                        label="Limit"
+                        onChange={handleLimit}
+                    >
+                        <MenuItem  value="5">5</MenuItem>
+                        <MenuItem selected value="10">10</MenuItem>
+                        <MenuItem value="15">15</MenuItem>
+                        <MenuItem value="20">20</MenuItem>
+                        <MenuItem value="25">25</MenuItem>
+                        <MenuItem value="30">30</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
             <TableContainer component={Paper}>
                 <Table sx={{minWidth: 650}} aria-label="simple table">
                     <TableHead>

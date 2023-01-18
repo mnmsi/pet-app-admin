@@ -38,9 +38,10 @@ const Pets = () => {
     let [query, setQuery] = useState("");
     let [totalPage, setTotalPage] = useState(0);
     let [select, setSelect] = useState("");
+    let [limit, setLimit] = useState(10);
+    let [safe, setSafe] = useState("");
     useEffect(() => {
-
-        axios.get(`${process.env.REACT_APP_API_URL}/api/pet/list?lost=${lost}&found=${found}&query=${query}&limit=7&page=${page}`).then((res) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/api/pet/list?lost=${lost}&found=${found}&query=${query}&limit=${limit}&page=${page}&safe=${safe}`, {headers: {Authorization: `Bearer ${isAuth}`},}).then((res) => {
             if (res.data.data) {
                 setPage(res.data.data?.currentPage);
                 setTotalPage(res.data.data?.totalPages);
@@ -48,7 +49,7 @@ const Pets = () => {
                 setLoading(false);
             }
         })
-    }, [page, found, lost, query])
+    }, [page, found, lost, query, limit, safe]);
 
     // handle lost found
     const handleLostFound = (e) => {
@@ -56,18 +57,29 @@ const Pets = () => {
         if (e.target.value === "lost") {
             setLost(1);
             setFound("");
+            setSafe("");
         } else if (e.target.value === "found") {
             setLost("");
             setFound(1);
+            setSafe("");
+        } else if (e.target.value === "safe") {
+            setSafe(1);
+            setLost("");
+            setFound("");
         } else {
             setLost("");
             setFound("");
+            setSafe("");
         }
+    }
+    // handle limit
+    const handleLimit = (e) => {
+        setLimit(e.target.value);
     }
     // show sighting
     const [open, setOpen] = useState(false);
     const [sighting, setSighting] = useState([]);
-    const showLostPetInfo = (e,pet) => {
+    const showLostPetInfo = (e, pet) => {
         if (pet.length > 0) {
             let renderSighting = pet.map((item, index) => {
                 return (
@@ -96,7 +108,7 @@ const Pets = () => {
     }
     // delete pet
     let isAuth = localStorage.getItem("pet-token") ?? null;
-    const handleDelete = (e,id) => {
+    const handleDelete = (e, id) => {
         e.stopPropagation();
         axios.get(`${process.env.REACT_APP_API_URL}/api/pet/delete`, {
                 headers: {Authorization: `Bearer ${isAuth}`},
@@ -136,8 +148,8 @@ const Pets = () => {
                     </TableCell>
                     <TableCell>{pet.species?.title}</TableCell>
                     <TableCell>
-                        <IconButton aria-label="delete" color="warning" onClick={(e) => handleDelete(e,pet._id)}>
-                            <DeleteIcon />
+                        <IconButton aria-label="delete" color="warning" onClick={(e) => handleDelete(e, pet._id)}>
+                            <DeleteIcon/>
                         </IconButton>
                     </TableCell>
                 </TableRow>
@@ -145,7 +157,7 @@ const Pets = () => {
         })
     } else {
         renderPetList = <TableRow>
-            <TableCell colSpan={11} align="center">No data found</TableCell>
+            <TableCell colSpan={12} align="center">No data found</TableCell>
         </TableRow>
     }
     return (
@@ -159,24 +171,44 @@ const Pets = () => {
                 {/*<Typography variant="h2" sx={{mt: 4, mb: 1}}>Pets</Typography>*/}
                 {/*   search*/}
                 <TextField
-                    label="Search"
+                    label="Type Pet Owner Name/Pet Name/Pet Type/Species/Colour/Gender"
                     fullWidth
                     variant="outlined"
 
                     onChange={(e) => setQuery(e.target.value)}
                 />
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Lost/Found</InputLabel>
+
+                <FormControl sx={{minWidth:300}}>
+                    <InputLabel id="demo-simple-select-label">Lost/Found/Safe</InputLabel>
                     <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={select}
-                        label="Lost/Found"
+                        label="Safe/Lost/Found"
                         onChange={handleLostFound}
                     >
                         <MenuItem selected value="select">Select</MenuItem>
+                        <MenuItem value="safe">Safe</MenuItem>
                         <MenuItem value="lost">Lost</MenuItem>
                         <MenuItem value="found">Found</MenuItem>
+                    </Select>
+                </FormControl>
+                {/*limit dropdown*/}
+                <FormControl variant="outlined" sx={{minWidth: 300}}>
+                    <InputLabel id="demo-simple-select-outlined-label">Limit</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-outlined-label"
+                        id="demo-simple-select-outlined"
+                        value={limit}
+                        label="Limit"
+                        onChange={handleLimit}
+                    >
+                        <MenuItem  value="5">5</MenuItem>
+                        <MenuItem selected value="10">10</MenuItem>
+                        <MenuItem value="15">15</MenuItem>
+                        <MenuItem value="20">20</MenuItem>
+                        <MenuItem value="25">25</MenuItem>
+                        <MenuItem value="30">30</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
@@ -221,7 +253,7 @@ const Pets = () => {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle sx={{fontSize:"20px",fontWeight:"600"}} id="alert-dialog-title">
+                    <DialogTitle sx={{fontSize: "20px", fontWeight: "600"}} id="alert-dialog-title">
                         {"Sighting Information"}
                     </DialogTitle>
                     <Box mx="20px">
@@ -230,11 +262,11 @@ const Pets = () => {
                                 <Table aria-label="simple table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell sx={{fontWeight:"bold"}}>Sighted By</TableCell>
-                                            <TableCell sx={{fontWeight:"bold"}}>Email</TableCell>
-                                            <TableCell sx={{fontWeight:"bold"}}>Location</TableCell>
-                                            <TableCell sx={{fontWeight:"bold"}}>Time</TableCell>
-                                            <TableCell sx={{fontWeight:"bold"}}>Date</TableCell>
+                                            <TableCell sx={{fontWeight: "bold"}}>Sighted By</TableCell>
+                                            <TableCell sx={{fontWeight: "bold"}}>Email</TableCell>
+                                            <TableCell sx={{fontWeight: "bold"}}>Location</TableCell>
+                                            <TableCell sx={{fontWeight: "bold"}}>Time</TableCell>
+                                            <TableCell sx={{fontWeight: "bold"}}>Date</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>

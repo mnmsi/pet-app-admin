@@ -104,7 +104,7 @@ const UpdateDistance = () => {
                                             fullWidth
                                             variant="filled"
                                             type="number"
-                                            label="Distance"
+                                            label={<><b>Distance</b> (Kilometers)</>}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
                                             value={values.title}
