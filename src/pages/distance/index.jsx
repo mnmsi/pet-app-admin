@@ -57,7 +57,7 @@ const Distance = () => {
                             {species.distance ? species.distance : "NULL"}
                         </TableCell>
                         <TableCell align="center">
-                            <b>{`Users within a ${species.distance} kilometer radius of the location where the pet went missing will be notified.`}</b>
+                            <b>Users within a <span style={{color:"red",fontSize:"14px"}}>{species.distance} kilometers</span> radius of the location where the pet went missing will be notified.</b>
                         </TableCell>
                         <TableCell
                             align="left">{species.updatedAt ? new Date(species.updatedAt).toDateString() : "NULL"}</TableCell>
